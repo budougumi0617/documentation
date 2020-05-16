@@ -5,7 +5,7 @@ components:
   links: {}
   parameters:
     ArchiveID:
-      description: The ID of the archive to get.
+      description: The ID of the archive.
       in: path
       name: archive_id
       required: true
@@ -660,10 +660,12 @@ components:
       properties:
         id:
           description: ID of the role.
+          example: 3653d3c6-0c75-11ea-ad28-fb5701eabc7d
           type: string
         type:
           default: roles
-          description: Type of role.
+          description: The type of the resource. The value should always be roles.
+          example: roles
           type: string
       type: object
     RelationshipToRoles:
@@ -713,17 +715,20 @@ components:
       properties:
         created_at:
           description: Creation time of the restriction query.
+          example: '2020-03-17T21:06:44.944905+00:00'
           format: date-time
           readOnly: true
           type: string
         modified_at:
           description: Time of last restriction query modification.
+          example: '2020-03-17T21:15:15.833683+00:00'
           format: date-time
           readOnly: true
           type: string
         restriction_query:
           description: The query that defines the restriction. Only the content matching
             the query can be returned.
+          example: <RESTRICTION_QUERY>
           type: string
       type: object
     RestrictionQueryCreateAttributes:
@@ -731,6 +736,12 @@ components:
       properties:
         restriction_query:
           description: The restriction query.
+          example: <RESTRICTION_QUERY>
+          type: string
+        type:
+          default: logs_restriction_queries
+          description: Restriction query resource type.
+          example: logs_restriction_queries
           type: string
       type: object
     RestrictionQueryCreateData:
@@ -780,10 +791,12 @@ components:
           $ref: '#/components/schemas/RestrictionQueryRoleAttribute'
         id:
           description: ID of the role.
+          example: <ROLE_ID>
           type: string
         type:
           default: roles
           description: Role resource type.
+          example: roles
           readOnly: true
           type: string
       type: object
@@ -792,6 +805,7 @@ components:
       properties:
         name:
           description: The role name.
+          example: <ROLE_NAME>
           type: string
       type: object
     RestrictionQueryRolesResponse:
@@ -809,6 +823,12 @@ components:
       properties:
         restriction_query:
           description: The restriction query.
+          example: <RESTRICTION_QUERY>
+          type: string
+        type:
+          default: logs_restriction_queries
+          description: Restriction query resource type.
+          example: logs_restriction_queries
           type: string
       type: object
     RestrictionQueryUpdateData:
@@ -834,12 +854,14 @@ components:
           $ref: '#/components/schemas/RestrictionQueryAttributes'
         id:
           description: ID of the restriction query.
+          example: <RESTRICTION_QUERY_ID>
           type: string
         relationships:
           $ref: '#/components/schemas/RestrictionQueryRelationships'
         type:
           default: logs_restriction_queries
           description: Restriction queries type.
+          example: logs_restriction_queries
           readOnly: true
           type: string
       type: object
@@ -861,10 +883,12 @@ components:
           $ref: '#/components/schemas/RestrictionQueryAttributes'
         id:
           description: ID of the restriction query.
+          example: <RESTRICTION_QUERY_ID>
           type: string
         type:
           default: logs_restriction_queries
           description: Restriction queries type.
+          example: logs_restriction_queries
           readOnly: true
           type: string
       type: object
@@ -1901,6 +1925,120 @@ paths:
                 $ref: '#/components/schemas/APIErrorResponse'
           description: Not found
       summary: Update an archive
+      tags:
+      - Logs Archives
+      x-codegen-request-body-name: body
+      x-unstable: '**Note**: This endpoint is in public beta.
+
+        If you have any feedback, contact [Datadog support](https://docs.datadoghq.com/help/).'
+  /api/v2/logs/config/archives/{archive_id}/readers:
+    delete:
+      description: Removes a role from an archive. ([Roles API](https://docs.datadoghq.com/api/v2/roles/))
+      operationId: RemoveRoleFromArchive
+      parameters:
+      - $ref: '#/components/parameters/ArchiveID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipToRole'
+      responses:
+        '204':
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Not found
+      summary: Revoke role from an archive
+      tags:
+      - Logs Archives
+      x-codegen-request-body-name: body
+      x-unstable: '**Note**: This endpoint is in public beta.
+
+        If you have any feedback, contact [Datadog support](https://docs.datadoghq.com/help/).'
+    get:
+      description: Returns all read roles a given archive is restricted to.
+      operationId: ListArchiveReadRoles
+      parameters:
+      - $ref: '#/components/parameters/ArchiveID'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolesResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Not found
+      summary: List read roles for an archive
+      tags:
+      - Logs Archives
+      x-codegen-request-body-name: body
+      x-unstable: '**Note**: This endpoint is in public beta.
+
+        If you have any feedback, contact [Datadog support](https://docs.datadoghq.com/help/).'
+    post:
+      description: Adds a read role to an archive. ([Roles API](https://docs.datadoghq.com/api/v2/roles/))
+      operationId: AddReadRoleToArchive
+      parameters:
+      - $ref: '#/components/parameters/ArchiveID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipToRole'
+      responses:
+        '204':
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Bad Request
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+          description: Not found
+      summary: Grant role to an archive
       tags:
       - Logs Archives
       x-codegen-request-body-name: body
